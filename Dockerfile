@@ -15,7 +15,7 @@ RUN bitnami-pkg install laravel-8.5.19-0 --checksum 1d6a06d0858477298af9c29b31d4
 RUN bitnami-pkg install gosu-1.12.0-2 --checksum 4d858ac600c38af8de454c27b7f65c0074ec3069880cb16d259a6e40a46bbc50
 # Upgrade composer to version 2
 RUN sudo composer self-update --2
-RUN mkdir /app && chown 1000:1000 /app
+RUN mkdir /app && chown bitnami:bitnami /app
 
 COPY rootfs /
 ENV BITNAMI_APP_NAME="laravel" \
@@ -28,5 +28,6 @@ ENV BITNAMI_APP_NAME="laravel" \
 EXPOSE 3000
 
 WORKDIR /app
-USER 1000
+USER bitnami
 ENTRYPOINT [ "/app-entrypoint.sh" ]
+CMD [ "php", "-v" ]

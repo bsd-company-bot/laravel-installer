@@ -74,7 +74,7 @@ setup_db() {
 
 print_welcome_page
 
-if [ "${1}" == "php" ] && [ "$2" == "artisan" ] && [ "$3" == "serve" ]; then
+if [ "${1}" == "php" ] && [ "$2" == "-v" ]; then
     if [[ ! -d /app/app ]]; then
         log "Creating laravel application"
         cp -a /tmp/app/. /app/
@@ -106,6 +106,14 @@ if [ "${1}" == "php" ] && [ "$2" == "artisan" ] && [ "$3" == "serve" ]; then
         setup_db
         log "Initialization finished"
         touch $INIT_SEM
+    fi
+
+    log "Initial passport"
+    if [[ ! -f /app/storage/oauth-private.key ]]; then
+        php artian passport:install
+        log "Passport successful initial"
+    else
+        log "Passport installed, skip this step"
     fi
 fi
 
