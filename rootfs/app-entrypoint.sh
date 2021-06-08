@@ -82,6 +82,11 @@ if [ "${1}" == "php" ] && [ "$2" == "-v" ]; then
         php artisan key:generate --ansi
     fi
 
+    if [[ ! -f /app/.env ]]; then
+        log "Setup from .env.example enviroment"
+        cp .env.example .env
+    fi
+
     log "Installing/Updating Laravel dependencies (composer)"
     if [[ ! -d /app/vendor ]]; then
         composer install
@@ -116,5 +121,4 @@ if [ "${1}" == "php" ] && [ "$2" == "-v" ]; then
         log "Passport installed, skip this step"
     fi
 fi
-
 exec tini -- "$@"
