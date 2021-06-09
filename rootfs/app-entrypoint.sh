@@ -48,7 +48,7 @@ setup_db() {
 
 print_welcome_page
 
-if [ "${1}" == "start" ]; then
+if [ "${1}" == "php" ] && [ "$2" == "v" ]; then
     if [[ ! -d /app/app ]]; then
         log "Regenerating APP_KEY"
         php artisan key:generate --ansi
@@ -75,6 +75,8 @@ if [ "${1}" == "start" ]; then
         log "Passport installed, skip this step"
     fi
     log "Success from Laravel Installer "
+else
+    log "Nothing happened"
 fi
-log "Nothing happened"
+exec tini -- "$@"
 
