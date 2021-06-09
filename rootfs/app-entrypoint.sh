@@ -37,32 +37,6 @@ replace_in_file() {
 }
 
 ########################
-# Wait for database to be ready
-# Globals:
-#   DATABASE_HOST
-#   DB_PORT
-# Arguments: none
-# Returns: none
-#########################
-wait_for_db() {
-    local -r db_host="${DB_HOST:-mariadb}"
-    local -r db_port="${DB_PORT:-3306}"
-    local db_address
-    db_address=$(getent hosts "$db_host" | awk '{ print $1 }')
-    local counter=0
-    log "Connecting to mariadb at $db_address"
-    while ! nc -z "$db_address" "$db_port" >/dev/null; do
-        counter=$((counter + 1))
-        if [ $counter == 30 ]; then
-            log "Error: Couldn't connect to mariadb."
-            exit 1
-        fi
-        log "Trying to connect to mariadb at $db_address. Attempt $counter."
-        sleep 5
-    done
-}
-
-########################
 # Setup the database configuration
 # Arguments: none
 # Returns: none
@@ -74,10 +48,8 @@ setup_db() {
 
 print_welcome_page
 
-if [ "${1}" == "php" ] && [ "$2" == "-v" ]; then
+if [ "${1}" == "start" ]; then
     if [[ ! -d /app/app ]]; then
-        log "Creating laravel application"
-        cp -a /tmp/app/. /app/
         log "Regenerating APP_KEY"
         php artisan key:generate --ansi
     fi
@@ -91,26 +63,13 @@ if [ "${1}" == "php" ] && [ "$2" == "-v" ]; then
         log "Dependencies updated"
     fi
 
-    wait_for_db
-
-    if [[ -f $INIT_SEM ]]; then
-        echo "#########################################################################"
-        echo "                                                                         "
-        echo " App initialization skipped:                                             "
-        echo " Delete the file $INIT_SEM and restart the container to reinitialize     "
-        echo " You can alternatively run specific commands using docker-compose exec   "
-        echo " e.g docker-compose exec myapp php artisan make:console FooCommand       "
-        echo "                                                                         "
-        echo "#########################################################################"
-    else
-        setup_db
-        log "Initialization finished"
-        touch $INIT_SEM
-    fi
+    log "Start migrate database"
+    setup_db
+    log "Initialization finished"
 
     log "Initial passport"
     if [[ ! -f /app/storage/oauth-private.key ]]; then
-        php artian passport:install
+        php artisan passport:install
         log "Passport successful initial"
     else
         log "Passport installed, skip this step"
