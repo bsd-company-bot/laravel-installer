@@ -30,4 +30,4 @@ EXPOSE 3000
 WORKDIR /app
 USER bitnami
 ENTRYPOINT [ "/app-entrypoint.sh" ]
-CMD [ "php", "-v" ]
+CMD [ "start"]
