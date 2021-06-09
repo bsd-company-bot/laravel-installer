@@ -74,5 +74,7 @@ if [ "${1}" == "start" ]; then
     else
         log "Passport installed, skip this step"
     fi
+    log "Success from Laravel Installer "
 fi
-exec tini -- "$@"
+log "Nothing happened"
+
